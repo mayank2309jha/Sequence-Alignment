@@ -1,0 +1,106 @@
+# This is the answer for Question 1.
+
+seq1 = ["A","T","C","A","G","A","G","T","A"]
+seq2 = ["T","T","C","A","G","T","A"]
+
+len1 = len(seq1)
+len2 = len(seq2)
+
+# This is our required 2d matrix
+alignmentGrid = []
+
+for i in range(0,10):
+    # This is done to create a 2d matrix of 10 columns and 8 rows.
+    # The sequence ATCAGAGTA is being kept on the side of the matrix.
+    toAdd = [0,0,0,0,0,0,0,0]
+    alignmentGrid.append(toAdd);
+
+pmis = -1
+pmatch = 2
+pgap = -1
+
+for i in range(1,8):
+    # We will fill elements in the first row of the alignmentGrid.
+    alignmentGrid[0][i] = alignmentGrid[0][i-1] - 1
+
+for i in range(1,10):
+    # We will try to fill elements in the first column of the alignmentGrid.
+    alignmentGrid[i][0] = alignmentGrid[i-1][0] - 1
+
+for i in range(1,10):
+    for j in range(1,8):
+        # We will first see if the two bases are equal or not.
+        # To find the score at posiiton i,j in the 2d matrix
+        # We will compare the bases at index i-1 in the sequence 1
+        # We will compare the bases at index j-1 in the sequence 2
+        up = alignmentGrid[i-1][j]
+        side = alignmentGrid[i][j-1]
+        diag = alignmentGrid[i-1][j-1]
+        # If the two bases are the same we do....
+        if seq1[i-1] == seq2[j-1]:
+            alignmentGrid[i][j] = diag + pmatch
+        # If the two bases are not same we do....    
+        else:
+            toFill = max(up+pgap,side+pgap,diag+pmis)
+            alignmentGrid[i][j] = toFill
+#--------------------------------------------------------------------------------------------------------------------------------------
+# This is the function which will take in a 2d Array and print it out.
+def printMat(matrix):
+    for i in range(0,len(matrix)):
+        for j in range(0,len(matrix[0])):
+            if matrix[i][j]>=0:
+                toPrint = str(matrix[i][j])
+                # This is being done just to ensure more symmetry in the printed result of the array.
+                toPrint = "+"+toPrint
+                print(toPrint,end = "  ")
+            else:
+                print(str(matrix[i][j]),end = "  ")
+        print()
+
+# Function Call to the print our bi-directional array.
+printMat(alignmentGrid)
+#--------------------------------------------------------------------------------------------------------------------------------------
+# This is our function which will take in a 2d Array and will create the Optimal Alignment.
+x = []
+y = []
+
+#As a result of this function the output will be aligned sequences however they will be in reverse order.
+def align(grid):
+    i = len(grid)-1
+    j = len(grid[0])-1
+    while i>0 or j>0:# As long as we haven't reached the top-left most element.
+        if seq1[i-1] == seq2[j-1]:# If the two corresponding bases are the same we jump to the diagonal elment on top-left.
+        # In the final sequence we include the two bases as they are the same and aligning them together gives us matching points.
+            x.append(seq1[i-1])
+            y.append(seq2[j-1])
+            i = i - 1
+            j = j - 1
+        elif grid[i-1][j-1] + pmis == grid[i][j]:# If the bases are not same but we can only move in diagonal top-left direction.
+        #Even thought the two bases do not match we have to include them and add mismatch penalty.
+            x.append(seq1[i-1])
+            y.append(seq2[j-1])
+            i = i - 1
+            j = j - 1
+        elif grid[i-1][j] + pgap == grid[i][j]:# There is a gap.
+        # We include one base but in place of another we include a gap.
+            x.append(seq1[i-1])
+            y.append("-")
+            i = i - 1
+        elif grid[i][j-1] + pgap == grid[i][j]:# There is a gap.
+        # We include one base but in place of another we include a gap.
+            x.append("-")
+            y.append(seq2[j-1])
+            j = j - 1
+#--------------------------------------------------------------------------------------------------------------------------------------
+align(alignmentGrid)
+print("Our sequences after alignment is...")
+alignx = []
+aligny = []
+#As a result of align function the output will be aligned sequences however they will be in reverse order.
+# We fix the order.
+for i in range(0,len(x)):
+    alignx.append(x[len(x)-i-1])
+for i in range(0,len(y)):
+    aligny.append(y[len(y)-i-1])
+print(aligny)
+print(alignx)
