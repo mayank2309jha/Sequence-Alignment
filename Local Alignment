@@ -1,0 +1,102 @@
+# This is the answer for Question 2.
+
+seq1 = ["A","T","C","A","G","A","G","T","A"]
+seq2 = ["T","T","C","A","G","T","A"]
+
+len1 = len(seq1)
+len2 = len(seq2)
+
+# This is our required 2d matrix
+alignmentGrid = []
+
+for i in range(0,10):
+    # This is done to create a 2d matrix of 10 columns and 8 rows.
+    # The sequence ATCAGAGTA is being kept on the side of the matrix.
+    toAdd = [0,0,0,0,0,0,0,0]
+    alignmentGrid.append(toAdd);
+
+pmis = -1
+pmatch = 2
+pgap = -1
+
+for i in range(1,8):
+    # We will fill elements in the first row of the alignmentGrid.
+    # Since this is a local alignment 2d matrix the minimum value is 0.
+    alignmentGrid[0][i] = 0
+
+for i in range(1,10):
+    # We will try to fill elements in the first column of the alignmentGrid.
+    # Since this is a local alignment 2d matrix the minimum value is 0.
+    alignmentGrid[i][0] = 0
+
+for i in range(1,10):
+    for j in range(1,8):
+        # We will first see if the two bases are equal or not.
+        # To find the score at posiiton i,j in the 2d matrix
+        # We will compare the base at index i-1 in the sequence 1
+        # We will compare the base at index j-1 in the sequence 2
+        up = alignmentGrid[i-1][j]
+        side = alignmentGrid[i][j-1]
+        diag = alignmentGrid[i-1][j-1]
+        # If the two bases are the same we do....
+        if seq1[i-1] == seq2[j-1]:
+            alignmentGrid[i][j] = diag + pmatch
+        else:
+            toFill = max(up+pgap,side+pgap,diag+pmis)
+            if toFill<0:
+                toFill = 0
+            alignmentGrid[i][j] = toFill
+#--------------------------------------------------------------------------------------------------------------------------------------
+# This is the function which will take in a 2d Array and print out the result.
+def printMat(matrix):
+    for i in range(0,len(matrix)):
+        for j in range(0,len(matrix[0])):
+            print(matrix[i][j],end = "  ")
+        print()
+
+# This will pirnt our a 2d Array.
+printMat(alignmentGrid)
+#--------------------------------------------------------------------------------------------------------------------------------------
+#As a result of this function the output will be aligned sequences however they will be in reverse order.
+def align(grid,i,j,x,y):
+    while grid[i][j] > 0:
+        if seq1[i-1] == seq2[j-1]:# If the two corresponding bases are the same we jump to the diagonal elment on top-left.
+        # In the final sequence we include the two bases as they are the same and aligning them together gives us matching points.
+            x.append(seq1[i-1])
+            y.append(seq2[j-1])
+            i = i - 1
+            j = j - 1
+        else:# This is the end of the local alignment
+            return;
+#--------------------------------------------------------------------------------------------------------------------------------------
+# This is our function which will take in a 2d Array and will create the Optimal Alignment.
+x = []
+y = []
+align(alignmentGrid,9,7,x,y)
+print("Our sequences after local alignment is...")
+alignx = []
+aligny = []
+#As a result of align function the output will be aligned sequences however they will be in reverse order.
+# We fix the order.
+for i in range(0,len(x)):
+    alignx.append(x[len(x)-i-1])
+for i in range(0,len(y)):
+    aligny.append(y[len(y)-i-1])
+print(aligny)
+print(alignx)
+#This is the second local alignment sequence-------------------------------------------------------------------------------------------
+x = []
+y = []
+align(alignmentGrid,5,5,x,y)
+print("Our sequences after local alignment is...")
+alignx = []
+aligny = []
+#As a result of align function the output will be aligned sequences however they will be in reverse order.
+# We fix the order.
+for i in range(0,len(x)):
+    alignx.append(x[len(x)-i-1])
+for i in range(0,len(y)):
+    aligny.append(y[len(y)-i-1])
+print(aligny)
+print(alignx)
+#--------------------------------------------------------------------------------------------------------------------------------------
